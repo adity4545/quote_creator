@@ -41,7 +41,7 @@ Create beautiful, customizable quote images for Instagram and social media.
 > **Note:** Direct HEIC export is not supported in browsers. For HEIC, download as PNG or JPEG and convert externally.
 
 ## Technologies Used
-- React
+- ![React](https://img.shields.io/badge/react-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
 - TypeScript
 - Tailwind CSS
 - Vite
