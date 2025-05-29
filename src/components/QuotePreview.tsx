@@ -2,6 +2,60 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useQuote } from '../context/QuoteContext';
 import { InstaQuote } from '../types';
 
+// Particle background component
+const ParticleBackground: React.FC = () => {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    let animationId: number;
+    const particles: { x: number; y: number; r: number; dx: number; dy: number; o: number }[] = [];
+    const count = 32;
+    for (let i = 0; i < count; i++) {
+      particles.push({
+        x: Math.random() * 1080,
+        y: Math.random() * 1080,
+        r: 2 + Math.random() * 3,
+        dx: (Math.random() - 0.5) * 0.7,
+        dy: (Math.random() - 0.5) * 0.7,
+        o: 0.2 + Math.random() * 0.3,
+      });
+    }
+    const draw = () => {
+      ctx.clearRect(0, 0, 1080, 1080);
+      for (const p of particles) {
+        ctx.save();
+        ctx.globalAlpha = p.o;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, 2 * Math.PI);
+        ctx.fillStyle = 'white';
+        ctx.shadowColor = '#fff';
+        ctx.shadowBlur = 8;
+        ctx.fill();
+        ctx.restore();
+        p.x += p.dx;
+        p.y += p.dy;
+        if (p.x < 0 || p.x > 1080) p.dx *= -1;
+        if (p.y < 0 || p.y > 1080) p.dy *= -1;
+      }
+      animationId = requestAnimationFrame(draw);
+    };
+    draw();
+    return () => cancelAnimationFrame(animationId);
+  }, []);
+  return (
+    <canvas
+      ref={canvasRef}
+      width={1080}
+      height={1080}
+      className="absolute inset-0 w-full h-full pointer-events-none z-0"
+      style={{ filter: 'blur(1.5px)' }}
+    />
+  );
+};
+
 const QuotePreview: React.FC = () => {
   const { quote } = useQuote();
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -59,64 +113,24 @@ const QuotePreview: React.FC = () => {
     height: number
   ) => {
     const gap = 16; // px
-    const radius = 85; // px border radius
+    const radius = 48; // px border radius
     ctx.save();
-    const count = Math.min(images.length, 4);
-    if (count === 1) {
-      const margin = 64;
-      drawImageWithRadius(ctx, images[0], margin, margin, width - margin * 2, height - margin * 2, radius, imageDrawFn);
-    } else if (count === 2) {
-      const imgWidth = (width - gap * 3) / 2;
-      const imgHeight = height - gap * 2;
-      drawImageWithRadius(ctx, images[0], gap, gap, imgWidth, imgHeight, radius, imageDrawFn);
-      drawImageWithRadius(ctx, images[1], imgWidth + gap * 2, gap, imgWidth, imgHeight, radius, imageDrawFn);
-    } else if (count === 3) {
-      const reducedGap = gap / 4;
-      const imgWidth = (width - reducedGap) / 2;
-      const imgHeight = (height - gap ) / 2;
-      // Top left
-      drawImageWithRadius(ctx, images[0], gap, gap, imgWidth, imgHeight, radius, imageDrawFn);
-      // Top right (reduced gap between)
-      drawImageWithRadius(ctx, images[1], gap + imgWidth + reducedGap, gap, imgWidth, imgHeight, radius, imageDrawFn);
-      // Bottom (spanning both columns)
-      drawImageWithRadius(ctx, images[2], gap, imgHeight + gap * 2, width - gap * 2, imgHeight, radius, imageDrawFn);
-    } else if (count === 4) {
-      // 2x2 grid
-      const imgWidth = (width - gap * 3) / 2;
-      const imgHeight = (height - gap * 3) / 2;
-      drawImageWithRadius(ctx, images[0], gap, gap, imgWidth, imgHeight, radius, imageDrawFn); // top left
-      drawImageWithRadius(ctx, images[1], imgWidth + gap * 2, gap, imgWidth, imgHeight, radius, imageDrawFn); // top right
-      drawImageWithRadius(ctx, images[2], gap, imgHeight + gap * 2, imgWidth, imgHeight, radius, imageDrawFn); // bottom left
-      drawImageWithRadius(ctx, images[3], imgWidth + gap * 2, imgHeight + gap * 2, imgWidth, imgHeight, radius, imageDrawFn); // bottom right
-    }
-    // Overlay for more than 4 images
-    if (images.length > 4) {
-      const imgWidth = (width - gap * 3) / 2;
-      const imgHeight = (height - gap * 3) / 2;
-      const x = imgWidth + gap * 2;
-      const y = imgHeight + gap * 2;
-      ctx.save();
-      ctx.globalAlpha = 0.7;
-      ctx.fillStyle = '#000';
-      ctx.beginPath();
-      ctx.moveTo(x + radius, y);
-      ctx.lineTo(x + imgWidth - radius, y);
-      ctx.quadraticCurveTo(x + imgWidth, y, x + imgWidth, y + radius);
-      ctx.lineTo(x + imgWidth, y + imgHeight - radius);
-      ctx.quadraticCurveTo(x + imgWidth, y + imgHeight, x + imgWidth - radius, y + imgHeight);
-      ctx.lineTo(x + radius, y + imgHeight);
-      ctx.quadraticCurveTo(x, y + imgHeight, x, y + imgHeight - radius);
-      ctx.lineTo(x, y + radius);
-      ctx.quadraticCurveTo(x, y, x + radius, y);
-      ctx.closePath();
-      ctx.fill();
-      ctx.globalAlpha = 1;
-      ctx.fillStyle = '#fff';
-      ctx.font = 'bold 64px Inter, sans-serif';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText(`+${images.length - 4}`, x + imgWidth / 2, y + imgHeight / 2);
+    const count = images.length;
+    if (count === 0) {
       ctx.restore();
+      return;
+    }
+    // Compute grid size
+    const cols = Math.ceil(Math.sqrt(count));
+    const rows = Math.ceil(count / cols);
+    const cellWidth = (width - gap * (cols + 1)) / cols;
+    const cellHeight = (height - gap * (rows + 1)) / rows;
+    for (let i = 0; i < count; i++) {
+      const row = Math.floor(i / cols);
+      const col = i % cols;
+      const x = gap + col * (cellWidth + gap);
+      const y = gap + row * (cellHeight + gap);
+      drawImageWithRadius(ctx, images[i], x, y, cellWidth, cellHeight, radius, imageDrawFn);
     }
     ctx.restore();
   };
@@ -210,6 +224,24 @@ const QuotePreview: React.FC = () => {
         break;
       case 'heading':
         fontFamily = 'Poppins, sans-serif';
+        break;
+      case 'roboto':
+        fontFamily = 'Roboto, sans-serif';
+        break;
+      case 'lobster':
+        fontFamily = 'Lobster, cursive';
+        break;
+      case 'pacifico':
+        fontFamily = 'Pacifico, cursive';
+        break;
+      case 'oswald':
+        fontFamily = 'Oswald, sans-serif';
+        break;
+      case 'montserrat':
+        fontFamily = 'Montserrat, sans-serif';
+        break;
+      case 'dancing':
+        fontFamily = 'Dancing Script, cursive';
         break;
       default:
         fontFamily = 'Inter, sans-serif';
@@ -338,10 +370,14 @@ const QuotePreview: React.FC = () => {
           </select>
         </div>
       </div>
-      <div className="w-full mb-6 aspect-square relative border-2 border-white/20 rounded-2xl overflow-hidden shadow-2xl bg-white/10 backdrop-blur-lg flex items-center justify-center">
+      <div className="w-full mb-6 aspect-square relative rounded-2xl overflow-hidden shadow-2xl flex items-center justify-center border-2 border-white/20" style={{background: 'linear-gradient(135deg, #1e293b 0%, #6366f1 100%)'}}>
+        {/* Animated particles background */}
+        <ParticleBackground />
+        {/* Canvas overlay with glassmorphic effect */}
+        <div className="absolute inset-0 z-10 pointer-events-none" style={{background: 'linear-gradient(120deg,rgba(255,255,255,0.08) 0%,rgba(99,102,241,0.08) 100%)', backdropFilter: 'blur(2px)'}} />
         <canvas
           ref={canvasRef}
-          className="w-full h-full"
+          className="w-full h-full relative z-20 drop-shadow-2xl"
         />
       </div>
       <button
@@ -360,13 +396,14 @@ const QuotePreview: React.FC = () => {
           }
         }}
         disabled={quote.imageUrls.length === 0}
-        className={`mt-2 w-full py-4 px-6 rounded-xl text-white font-extrabold text-lg tracking-wide shadow-xl transition-all duration-200 backdrop-blur-lg bg-gradient-to-r from-primary-700 via-primary-500 to-primary-400 border-none hover:scale-105 hover:from-primary-600 hover:to-primary-300 focus:outline-none focus:ring-2 focus:ring-primary-400 ${
-          quote.imageUrls.length === 0
-            ? 'bg-neutral-700 cursor-not-allowed opacity-60'
-            : ''
-        }`}
+        className={`mt-2 w-full py-4 px-6 rounded-xl text-white font-extrabold text-lg tracking-wide shadow-xl transition-all duration-200 backdrop-blur-lg bg-gradient-to-r from-fuchsia-600 via-indigo-500 to-sky-400 border-none focus:outline-none focus:ring-2 focus:ring-primary-400 relative overflow-hidden
+          ${quote.imageUrls.length === 0 ? 'bg-neutral-700 cursor-not-allowed opacity-60' : 'hover:scale-105 hover:from-fuchsia-700 hover:to-sky-300'}
+        `}
+        style={{boxShadow: '0 0 24px 0 rgba(99,102,241,0.25), 0 4px 32px 0 rgba(236,72,153,0.12)'}}
       >
-        Download Image
+        <span className="relative z-10">Download Image</span>
+        {/* Glow effect */}
+        <span className="absolute inset-0 z-0 rounded-xl bg-gradient-to-r from-fuchsia-400 via-indigo-400 to-sky-300 opacity-30 blur-lg" />
       </button>
     </div>
   );

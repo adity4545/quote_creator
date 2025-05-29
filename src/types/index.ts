@@ -1,4 +1,15 @@
-export type Font = 'sans' | 'serif' | 'mono' | 'display' | 'heading';
+export type Font =
+  | 'sans'
+  | 'serif'
+  | 'mono'
+  | 'display'
+  | 'heading'
+  | 'roboto'
+  | 'lobster'
+  | 'pacifico'
+  | 'oswald'
+  | 'montserrat'
+  | 'dancing';
 
 export type TextAlignment = 'left' | 'center' | 'right';
 

@@ -8,12 +8,18 @@ const StyleEditor: React.FC = () => {
   const { quote, updateStyle, updateBackgroundStyle } = useQuote();
   const { style, backgroundStyle } = quote;
 
-  const fontOptions: { value: Font; label: string }[] = [
-    { value: 'sans', label: 'Sans' },
-    { value: 'serif', label: 'Serif' },
-    { value: 'mono', label: 'Mono' },
-    { value: 'display', label: 'Display' },
-    { value: 'heading', label: 'Heading' },
+  const fontOptions: { value: Font; label: string; fontFamily?: string }[] = [
+    { value: 'sans', label: 'Sans', fontFamily: 'Inter, sans-serif' },
+    { value: 'serif', label: 'Serif', fontFamily: 'Georgia, serif' },
+    { value: 'mono', label: 'Mono', fontFamily: 'monospace' },
+    { value: 'display', label: 'Display', fontFamily: 'Playfair Display, serif' },
+    { value: 'heading', label: 'Heading', fontFamily: 'Poppins, sans-serif' },
+    { value: 'roboto', label: 'Roboto', fontFamily: 'Roboto, sans-serif' },
+    { value: 'lobster', label: 'Lobster', fontFamily: 'Lobster, cursive' },
+    { value: 'pacifico', label: 'Pacifico', fontFamily: 'Pacifico, cursive' },
+    { value: 'oswald', label: 'Oswald', fontFamily: 'Oswald, sans-serif' },
+    { value: 'montserrat', label: 'Montserrat', fontFamily: 'Montserrat, sans-serif' },
+    { value: 'dancing', label: 'Dancing Script', fontFamily: 'Dancing Script, cursive' },
   ];
 
   const backgroundOptions: { value: BackgroundStyle; label: string }[] = [
@@ -36,6 +42,7 @@ const StyleEditor: React.FC = () => {
                   ? 'bg-gradient-to-r from-primary-700 to-primary-400 text-white border-2 border-primary-300 scale-105'
                   : 'bg-white/10 text-white border border-white/20 hover:bg-primary-700/30 hover:scale-105'
               }`}
+              style={{ fontFamily: font.fontFamily }}
             >
               {font.label}
             </button>
