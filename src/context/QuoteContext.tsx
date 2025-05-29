@@ -1,5 +1,5 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
-import { InstaQuote, QuoteStyle, BackgroundStyle, Font, TextAlignment } from '../types';
+import React, { createContext, ReactNode, useContext, useState } from 'react';
+import { BackgroundStyle, InstaQuote, QuoteStyle } from '../types';
 
 interface QuoteContextType {
   quote: InstaQuote;
@@ -17,8 +17,8 @@ const initialStyle: QuoteStyle = {
   fontSize: 48,
   alignment: 'center',
   opacity: 1,
-  shadowColor: '#000000',
-  shadowBlur: 5,
+  shadowColor: '#000',
+  shadowBlur: 10,
 };
 
 const initialQuote: InstaQuote = {
@@ -27,7 +27,7 @@ const initialQuote: InstaQuote = {
   quote: 'Your quote goes here...',
   author: 'Your Name',
   style: initialStyle,
-  backgroundStyle: 'blurred',
+  backgroundStyle: 'collage',
 };
 
 const QuoteContext = createContext<QuoteContextType | undefined>(undefined);

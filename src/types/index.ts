@@ -2,7 +2,7 @@ export type Font = 'sans' | 'serif' | 'mono' | 'display' | 'heading';
 
 export type TextAlignment = 'left' | 'center' | 'right';
 
-export type BackgroundStyle = 'collage' | 'blurred' | 'split' | 'gradient';
+export type BackgroundStyle = 'collage' | 'blend';
 
 export interface QuoteStyle {
   font: Font;
@@ -12,6 +12,7 @@ export interface QuoteStyle {
   opacity: number;
   shadowColor: string;
   shadowBlur: number;
+  imageOpacity?: number;
 }
 
 export interface InstaQuote {
