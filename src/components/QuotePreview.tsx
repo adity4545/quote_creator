@@ -296,9 +296,9 @@ const QuotePreview: React.FC = () => {
     const boxY = y - boxPaddingY / 2 - lineHeight;
     // Draw glassmorphic background
     ctx.save();
-    ctx.globalAlpha = 0.55;
-    ctx.filter = 'blur(0.5px)';
-    ctx.fillStyle = '#18181b';
+    ctx.globalAlpha = 1;
+    ctx.filter = 'blur(0.1px)';
+    ctx.fillStyle = 'rgba(8,8,16,0.70)';
     ctx.beginPath();
     ctx.moveTo(boxX + 32, boxY);
     ctx.lineTo(boxX + boxWidth - 32, boxY);
