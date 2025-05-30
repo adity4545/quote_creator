@@ -115,7 +115,7 @@ const StyleEditor: React.FC = () => {
         </div>
       </div>
 
-      <div>
+      {/* <div>
         <label className="block text-base font-semibold mb-2">
           Text Opacity: {Math.round(style.opacity * 100)}%
         </label>
@@ -128,9 +128,9 @@ const StyleEditor: React.FC = () => {
           onChange={(e) => updateStyle({ opacity: parseFloat(e.target.value) })}
           className="w-full accent-primary-400 h-2 rounded-xl bg-white/20"
         />
-      </div>
+      </div> */}
 
-      <div>
+      {/* <div>
         <label className="block text-base font-semibold mb-2">
           Text Shadow: {style.shadowBlur}px
         </label>
@@ -142,7 +142,7 @@ const StyleEditor: React.FC = () => {
           onChange={(e) => updateStyle({ shadowBlur: parseInt(e.target.value, 10) })}
           className="w-full accent-primary-400 h-2 rounded-xl bg-white/20"
         />
-      </div>
+      </div> */}
 
       <div>
         <label className="block text-base font-semibold mb-2">Background Style</label>
