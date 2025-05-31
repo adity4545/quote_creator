@@ -44,7 +44,7 @@ const AnimatedSolarSystemBackground: React.FC = () => {
     let cy = height / 2;
     // Calculate dynamic scale so Neptune's orbit fits with margin
     const maxOrbit = Math.max(...PLANETS.map(p => p.orbit));
-    const margin = 0.10; // 10% margin
+    const margin = 0.10; // 20% margin for better fit
     let fitScale = ((Math.min(width, height) / 2) * (1 - margin)) / maxOrbit;
     let scale = fitScale;
 
@@ -72,10 +72,12 @@ const AnimatedSolarSystemBackground: React.FC = () => {
     // Generate static starfield (positions and sizes)
     const STAR_COUNT = 180;
     const stars = Array.from({ length: STAR_COUNT }, () => ({
-      x: Math.random(), // normalized [0,1]
+      x: Math.random(),
       y: Math.random(),
       r: 0.5 + Math.random() * 1.5,
-      opacity: 0.3 + Math.random() * 0.7,
+      baseOpacity: 0.3 + Math.random() * 0.7,
+      twinkleSpeed: 0.5 + Math.random() * 1.5,
+      twinklePhase: Math.random() * Math.PI * 2,
     }));
 
     // Each planet gets its own angle
@@ -94,12 +96,17 @@ const AnimatedSolarSystemBackground: React.FC = () => {
       }
     }
 
-    function draw() {
-      ctx.clearRect(0, 0, width, height);
-      // Draw starfield particles
+    function drawBackground(time: number) {
+      // Draw solid dark black background
+      ctx.save();
+      ctx.fillStyle = '#0a0a0a';
+      ctx.fillRect(0, 0, width, height);
+      ctx.restore();
+      // Draw animated twinkling stars
       for (const s of stars) {
         ctx.save();
-        ctx.globalAlpha = s.opacity;
+        const twinkle = 0.5 + 0.5 * Math.sin(time * 0.001 * s.twinkleSpeed + s.twinklePhase);
+        ctx.globalAlpha = s.baseOpacity * (0.7 + 0.6 * twinkle);
         ctx.beginPath();
         ctx.arc(s.x * width, s.y * height, s.r, 0, 2 * Math.PI);
         ctx.fillStyle = '#fff';
@@ -108,12 +115,16 @@ const AnimatedSolarSystemBackground: React.FC = () => {
         ctx.fill();
         ctx.restore();
       }
+    }
+
+    function draw(time = 0) {
+      ctx.clearRect(0, 0, width, height);
+      drawBackground(time);
       // Draw orbits
       drawOrbits();
       // Draw sun
       const sunR = 48 * scale;
-      ctx.save();
-      ctx.globalAlpha = 1;
+      ctx.save(); ctx.globalAlpha = 1;
       ctx.drawImage(sunImg, cx - sunR, cy - sunR, sunR * 2, sunR * 2);
       ctx.restore();
       // Animate and draw planets
@@ -124,8 +135,7 @@ const AnimatedSolarSystemBackground: React.FC = () => {
         const orbitX = cx + Math.cos(angle) * planet.orbit * scale;
         const orbitY = cy + Math.sin(angle) * planet.orbit * scale;
         const planetImg = planetImgs[i];
-        ctx.save();
-        ctx.globalAlpha = 1;
+        ctx.save(); ctx.globalAlpha = 1;
         ctx.drawImage(
           planetImg,
           orbitX - planet.r * scale,
@@ -139,8 +149,7 @@ const AnimatedSolarSystemBackground: React.FC = () => {
           moonAngle += MOON.speed * 0.7;
           const moonOrbitX = orbitX + Math.cos(moonAngle) * MOON.orbit * scale;
           const moonOrbitY = orbitY + Math.sin(moonAngle) * MOON.orbit * scale;
-          ctx.save();
-          ctx.globalAlpha = 1;
+          ctx.save(); ctx.globalAlpha = 1;
           ctx.drawImage(
             moonImg,
             moonOrbitX - MOON.r * scale,
