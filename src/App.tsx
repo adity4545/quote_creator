@@ -1,8 +1,8 @@
 import { useState } from 'react';
+import AnimatedSolarSystemBackground from './components/AnimatedSolarSystemBackground';
 import ControlPanel from './components/ControlPanel';
 import Header from './components/Header';
 import HowItWorks from './components/HowItWorks';
-import ParticlesBackground from './components/ParticlesBackground';
 import QuotePreview from './components/QuotePreview';
 import { QuoteProvider } from './context/QuoteContext';
 
@@ -14,8 +14,8 @@ function App() {
   return (
     <QuoteProvider>
       <div className="min-h-screen font-sans relative">
-        {/* Animated particles background behind everything */}
-        <ParticlesBackground />
+        {/* Animated solar system background */}
+        <AnimatedSolarSystemBackground />
         <div className="relative z-10">
           <Header onHowItWorks={() => setShowHowItWorks(true)} />
           <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
