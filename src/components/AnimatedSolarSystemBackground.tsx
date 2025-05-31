@@ -8,18 +8,18 @@ import neptuneImgSrc from '../assets/neptune-removebg-preview.png';
 import saturnImgSrc from '../assets/saturn-image-removebg-preview.png';
 import sunImgSrc from '../assets/sun-removebg-preview.png';
 import uranusImgSrc from '../assets/uranus-removebg-preview.png';
-import venusImgSrc from '../assets/venus-removebg-preview.png';
+import venusImgSrc from '../assets/venus-removebg-preview (1).png';
 
 // Solar system data (distances and sizes are not to scale for aesthetics)
 const PLANETS = [
   { name: 'Mercury', img: mercuryImgSrc, orbit: 60, r: 12, speed: 0.018 },
   { name: 'Venus', img: venusImgSrc, orbit: 90, r: 18, speed: 0.014 },
-  { name: 'Earth', img: earthImgSrc, orbit: 120, r: 20, speed: 0.011 },
-  { name: 'Mars', img: marsImgSrc, orbit: 150, r: 16, speed: 0.009 },
-  { name: 'Jupiter', img: jupiterImgSrc, orbit: 200, r: 36, speed: 0.006 },
-  { name: 'Saturn', img: saturnImgSrc, orbit: 250, r: 32, speed: 0.005 },
-  { name: 'Uranus', img: uranusImgSrc, orbit: 300, r: 24, speed: 0.004 },
-  { name: 'Neptune', img: neptuneImgSrc, orbit: 350, r: 22, speed: 0.003 },
+  { name: 'Earth', img: earthImgSrc, orbit: 160, r: 20, speed: 0.011 },
+  { name: 'Mars', img: marsImgSrc, orbit: 250, r: 16, speed: 0.009 },
+  { name: 'Jupiter', img: jupiterImgSrc, orbit: 320, r: 36, speed: 0.006 },
+  { name: 'Saturn', img: saturnImgSrc, orbit: 400, r: 32, speed: 0.005 },
+  { name: 'Uranus', img: uranusImgSrc, orbit: 480, r: 24, speed: 0.004 },
+  { name: 'Neptune', img: neptuneImgSrc, orbit: 560, r: 22, speed: 0.003 },
 ];
 
 const MOON = {
@@ -42,7 +42,11 @@ const AnimatedSolarSystemBackground: React.FC = () => {
     let height = canvas.height = window.innerHeight;
     let cx = width / 2;
     let cy = height / 2;
-    let scale = Math.min(width, height) / 900;
+    // Calculate dynamic scale so Neptune's orbit fits with margin
+    const maxOrbit = Math.max(...PLANETS.map(p => p.orbit));
+    const margin = 0.10; // 10% margin
+    let fitScale = ((Math.min(width, height) / 2) * (1 - margin)) / maxOrbit;
+    let scale = fitScale;
 
     function resize() {
       if (!canvas) return;
@@ -50,7 +54,7 @@ const AnimatedSolarSystemBackground: React.FC = () => {
       height = canvas.height = window.innerHeight;
       cx = width / 2;
       cy = height / 2;
-      scale = Math.min(width, height) / 900;
+      scale = fitScale;
     }
     window.addEventListener('resize', resize);
 
